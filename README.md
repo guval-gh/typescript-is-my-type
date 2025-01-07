@@ -35,6 +35,16 @@ This repository is not a:
 - comprehensive guide to TypeScript
 - cheat sheet or reference for the entire TypeScript language
 
+If you are looking to learn TypeScript, you can find many resources on the [official website](https://www.typescriptlang.org/):
+
+- [TypeScript Documentations](https://www.typescriptlang.org/docs/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+
+You can also find resources created by the community:
+
+- [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
+- [TypeScript CheatSheet](https://react-typescript-cheatsheet.netlify.app/docs/basic/setup)
+
 ### What this repository is
 
 This repository is simply a collection of tips and tricks for TypeScript found during my developments, while researching on the internet or social networks.
