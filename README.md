@@ -2,11 +2,11 @@
 
 Tips and tricks for TypeScript
 
-- [Introduction](#introduction)
+- Introduction
   - [What is TypeScript?](#what-is-typescript)
   - [What this repository is NOT](#what-this-repository-is-not)
   - [What this repository is](#what-this-repository-is)
-- [TypeScript Tips & Tricks](#typescript-tips-and-tricks)
+- TypeScript Tips & Tricks
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
   - [Stronger Types with Branded Types and Type Aliases](#stronger-types-with-branded-types-and-type-aliases)
@@ -14,6 +14,13 @@ Tips and tricks for TypeScript
   - [Conditional Types](#conditional-types)
   - [XOR Operator](#xor-operator)
   - [Check data with asserts condition](#check-data-with-asserts-condition)
+- Generic Tips & Tricks
+  - [Avoid nested Try/Catch](#avoid-nested-trycatch)
+  - [Logical Assignment Operators](#logical-assignment-operators)
+
+🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧  
+🚧🚧🚧 WORK IN PROGRESS 🚧🚧🚧🚧  
+🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
 
 # Introduction
 
@@ -268,4 +275,62 @@ const createUser = (input: unknown) => {
 createUser({ name: "Jack", email: "jack@example.com" }); // ✅ OK - Valid user object
 createUser({ name: "Jack", email: "unvalid.com" }); // ❌ Use email should be valid!
 createUser({ email: "jack@example.com" }); // ❌ Username is missing!
+```
+
+# Generic Tips & Tricks
+
+## Avoid nested Try/Catch
+
+Old way:
+
+```javascript
+const getJsonData = async () => {
+  try {
+    const response = await fetch("https://api.example.com/data");
+    const jsonData = await response.json();
+
+    return jsonData;
+  } catch (error) {
+    console.error(error);
+  }
+};
+```
+
+Possible way:
+
+You can use the `?=` operator to destructure the Promise into [error, data] then handle fetchError and jsonError separately.
+
+```javascript
+const getJsonData = async () => {
+  const [fetchError, fetchData] ?= await fetch("https://api.example.com/data")
+
+  if (fetchError) {
+    console.error('Fetch Error:', fetchError)
+    return
+  }
+
+  const [jsonError, jsonData] ?= await fetchData.json()
+
+  if (jsonError) {
+    console.error('Json Error:', jsonError)
+    return
+  }
+
+  return jsonData
+}
+```
+
+## Logical Assignment Operators
+
+```javascript
+const obj = { a: 10, b: 0, c: 1 };
+
+obj.z ??= 40; // if z is null or undefined, set z to 40
+console.log(obj); // { a: 10, b: 0, c: 1, z: 40 }
+
+obj.b ||= 20; // if b is false, set b to 20
+console.log(obj); // { a: 10, b: 20, c: 1, z: 40 }
+
+obj.c &&= 30; // if c is true or have value, set c to 30
+console.log(obj); // { a: 10, b: 20, c: 30, z: 40 }
 ```
