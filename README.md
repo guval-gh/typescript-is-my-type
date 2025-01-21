@@ -1,12 +1,20 @@
-# TypeScript - Tips & Tricks
+# TypeScript
 
-Tips and tricks for TypeScript
+🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧  
+🚧🚧🚧 WORK IN PROGRESS 🚧🚧🚧🚧  
+🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
 
-- Introduction
+- [Introduction](#introduction)
   - [What is TypeScript?](#what-is-typescript)
-  - [What this repository is NOT](#what-this-repository-is-not)
-  - [What this repository is](#what-this-repository-is)
-- TypeScript Tips & Tricks
+- [Basic Types](#basic-types)
+  - [Primitive Types](#primitive-types)
+  - [Literal Types](#literal-types)
+  - [Object Types](#object-types)
+  - [Subtyping](#subtyping)
+  - [Unknown Type](#unknown-type)
+  - [Never Type](#never-type)
+  - [Any Type](#any-type)
+- [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
   - [Stronger Types with Branded Types and Type Aliases](#stronger-types-with-branded-types-and-type-aliases)
@@ -14,13 +22,9 @@ Tips and tricks for TypeScript
   - [Conditional Types](#conditional-types)
   - [XOR Operator](#xor-operator)
   - [Check data with asserts condition](#check-data-with-asserts-condition)
-- Generic Tips & Tricks
+- [Generic Tips and Tricks](#generic-tips-and-tricks)
   - [Avoid nested Try/Catch](#avoid-nested-trycatch)
   - [Logical Assignment Operators](#logical-assignment-operators)
-
-🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧  
-🚧🚧🚧 WORK IN PROGRESS 🚧🚧🚧🚧  
-🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧🚧
 
 # Introduction
 
@@ -37,29 +41,160 @@ Key features of TypeScript include:
 - **Type Inference**: Even without explicit type annotations, TypeScript can often infer types based on how variables and functions are used, providing type safety with minimal extra code.
   TypeScript code is transpiled into JavaScript, which can run in any environment that supports JavaScript, including browsers, Node.js, and other runtime environments.
 
-## What this repository is NOT
+# Basic Types
 
-This repository is not a:
+## Primitive Types
 
-- course or tutorial to learn TypeScript from scratch
-- comprehensive guide to TypeScript
-- cheat sheet or reference for the entire TypeScript language
+These primitive types are the foundation for building more complex types in TypeScript. When declaring variables, TypeScript can infer these types automatically, or they can be explicitly annotated:
 
-If you are looking to learn TypeScript, you can find many resources on the [official website](https://www.typescriptlang.org/):
+- **string**: Represents textual data (`"hello"`, `'world'`)
+- **number**: Represents both integer and floating point numbers (`42`, `3.14`)
+- **boolean**: Represents `true` or `false` values
+- **symbol**: Represents unique identifiers created via `Symbol()`
+- **bigint**: Represents arbitrarily large integers (e.g. `9007199254740991n`)
+- **null**: Represents the intentional absence of any object value
+- **undefined**: Represents uninitialized variables or missing properties
 
-- [TypeScript Documentations](https://www.typescriptlang.org/docs/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+```ts
+type Primitive = string | number | boolean | symbol | bigint | null | undefined;
+```
 
-You can also find resources created by the community:
+## Literal Types
 
-- [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
-- [TypeScript CheatSheet](https://react-typescript-cheatsheet.netlify.app/docs/basic/setup)
+Literal types are more specific versions of primitive types. While primitive types represent a broad category of values (like any string or any number), literal types represent exact, specific values. A literal type can only have one specific value:
 
-## What this repository is
+- A primitive `string` type can hold any string value
+- A literal type `"hello"` can only hold the exact string "hello"
+- `null` and `undefined` are literal types that can only hold their respective value
 
-This repository is simply a collection of tips and tricks for TypeScript found during my developments, while researching on the internet or social networks.
+```ts
+type Literal = "string" | 1 | true | null | undefined;
+```
 
-# TypeScript Tips & Tricks
+## Object Types
+
+Some examples (more details on each type in the following sections):
+
+```ts
+type DataStructures =
+  | { name: string; age: number } // Object literal type
+  | { [key: string]: string } // Record type (Index signature)
+  | Record<string, number> // Record type (key-value pairs)
+  | [number, boolean] // Tuple type
+  | string[] // Array type
+  | Array<number>; // Generic array type
+```
+
+## Subtyping
+
+Subtyping refers to the relationship between types where one type is considered a "subtype" of another type if it can be safely used in place of the other type.
+
+```ts
+let capybara: "Capybara" = "Capybara";
+let cat: "Cat" = "Cat";
+
+let animal: string;
+
+animal = capybara; // ✅
+animal = cat; // ✅
+
+cat = animal; // ❌
+
+// capybara is a subtype of "Capibara"
+// cat is a subtype of "Cat"
+```
+
+## Unknown Type
+
+- The `unknown` type is a supertype of all types. It is a more flexible version of `any`, but unlike `any`, it requires explicit type checking before it can be used.
+- `unknown` is a supertype of every other type, but no other type is a supertype of `unknown`.
+
+Logic:
+
+```ts
+X | unknown = unknown
+X & unknown = X
+```
+
+## Never Type
+
+- The `never` type represents values that are never actually produced. It is a subtype of all types, meaning any type can be assigned to `never`, but `never` cannot be assigned to any type.
+- `never` is a subtype of every other type, but no other type is a subtype of `never`.
+
+Logic:
+
+```ts
+X | never = X
+X & never = never
+```
+
+Example:
+
+```ts
+// Function that throws error returns never
+function throwError(message: string): never {
+  throw new Error(message);
+}
+
+// Function with infinite loop returns never
+function infiniteLoop(): never {
+  while (true) {
+    // do something forever
+  }
+}
+
+// never in exhaustive checks
+type Animal = "dog" | "cat";
+
+function processAnimal(animal: Animal) {
+  switch (animal) {
+    case "dog":
+      console.log("woof");
+      break;
+    case "cat":
+      console.log("meow");
+      break;
+    default:
+      // This line will error if we forget to handle a case
+      const exhaustiveCheck: never = animal;
+  }
+}
+```
+
+```ts
+function fail(): never {
+  throw new Error("Something failed");
+}
+
+const userName: string = fail(); // ✅
+const userAge: number = fail(); // ✅
+const userIsAdmin: boolean = fail(); // ✅
+const anything: any = fail(); // ✅
+```
+
+## Any Type
+
+- The `any` type is the most flexible type in TypeScript. It allows you to assign any value to a variable, even if it's not explicitly typed.
+- `any` type is both a subtype and a supertype of every other type.
+
+Logic:
+
+```ts
+X | any = any
+X & any = any
+```
+
+Example:
+
+```ts
+let anything: any = "Hello, world!";
+anything = 42;
+anything = true;
+anything = null;
+anything = undefined;
+```
+
+# TypeScript Tips and Tricks
 
 ## Create Type from Enum
 
@@ -277,7 +412,7 @@ createUser({ name: "Jack", email: "unvalid.com" }); // ❌ Use email should be v
 createUser({ email: "jack@example.com" }); // ❌ Username is missing!
 ```
 
-# Generic Tips & Tricks
+# Generic Tips and Tricks
 
 ## Avoid nested Try/Catch
 
