@@ -20,6 +20,12 @@
   - [Key Extraction](#key-extraction)
   - [Handling undefined](#handling-undefined)
   - [Combining](#combining)
+- [Helper/Utility Types](#helperutility-types)
+  - [Record](#record)
+  - [Partial](#partial)
+  - [Required](#required)
+  - [Pick](#pick)
+  - [Omit](#omit)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -328,6 +334,85 @@ type KeyOfB = keyof B; // => 'b' | 'c'
 
 type C = A | B;
 type KeyOfC = keyof C; // => 'c'
+```
+
+# Helper/Utility Types
+
+TypeScript provides several built-in utility types that help you manipulate and work with types.
+
+## Record
+
+```ts
+// Record<K, T>
+
+type PaymentStatus = Record<string, boolean>;
+// Equal to:
+type PaymentStatus = { [key: string]: boolean };
+```
+
+```ts
+type PaymentStatus = Record<"free" | "paid", boolean>;
+// These are equivalent:
+type PaymentStatus = { free: boolean; paid: boolean };
+type PaymentStatus = { [Key in "free" | "paid"]: boolean };
+
+// Can access to keys like this:
+type ValueType = PaymentStatus[string];
+// type ValueType = boolean
+```
+
+## Partial
+
+```ts
+// Partial<T>
+
+type User = {
+  name: string;
+  age: number;
+  isAdmin: boolean;
+};
+
+type PartialUser = Partial<User>;
+// type PartialUser = { name?: string; age?: number; isAdmin?: boolean }
+
+type PartialUser = Partial<User, "name" | "age">;
+// type PartialUser = { name?: string; age?: number }
+```
+
+## Required
+
+```ts
+// Required<T>
+
+type User = { name?: string; age?: number; isAdmin?: boolean };
+
+type RequiredUser = Required<User>;
+// type RequiredUser = { name: string; age: number; isAdmin: boolean }
+
+type RequiredUser = Required<User, "name" | "age">;
+// type RequiredUser = { name: string; age: number }
+```
+
+## Pick
+
+```ts
+// Pick<T, K>
+
+type User = { name: string; age: number; isAdmin: boolean };
+
+type PickUser = Pick<User, "name" | "age">;
+// type PickUser = { name: string; age: number }
+```
+
+## Omit
+
+```ts
+// Omit<T, K>
+
+type User = { name: string; age: number; isAdmin: boolean };
+
+type OmitUser = Omit<User, "isAdmin">;
+// type OmitUser = { name: string; age: number }
 ```
 
 # TypeScript Tips and Tricks
