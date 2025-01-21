@@ -14,6 +14,12 @@
   - [Unknown Type](#unknown-type)
   - [Never Type](#never-type)
   - [Any Type](#any-type)
+- [Union and Intersection](#union-and-intersection)
+  - [Accessibility Rules](#accessibility-rules)
+  - [Accessing Properties](#accessing-properties)
+  - [Key Extraction](#key-extraction)
+  - [Handling undefined](#handling-undefined)
+  - [Combining](#combining)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -192,6 +198,136 @@ anything = 42;
 anything = true;
 anything = null;
 anything = undefined;
+```
+
+# Union and Intersection
+
+Union types allow a value to be one of several types (using `|`), while intersection types combine multiple types into one (using `&`).
+
+```ts
+// type Union = A | B
+type Union = "string" | 1 | true | null | undefined;
+
+// type Intersection = A & B
+type Intersection = { name: string } & { age: number };
+```
+
+## Accessibility Rules
+
+```ts
+type User = {
+  name: string;
+  age: number;
+  isAdmin: boolean;
+};
+
+const jack: User = {
+  name: "Jack",
+  age: 25,
+  isAdmin: false,
+};
+
+const john = {
+  name: "John",
+  age: 30,
+  isAdmin: true,
+  extraProperty: "extra",
+};
+
+// Allows extra properties
+const admin: User = john;
+admin.extraProperty; // ❌ Property 'extraProperty' does not exist on type 'User'.
+
+// But exist in the object
+console.log(admin.extraProperty);
+//  Return
+// {
+//   "name": "John",
+//   "age": 30,
+//   "isAdmin": true,
+//   "extraProperty": "extra"
+// }
+```
+
+## Accessing Properties
+
+```ts
+// type NameOrAge = User["name" | "age"]
+type NameOrAge = User["name"] | User["age"];
+
+type Age = User["age"];
+type Role = User["isAdmin"];
+```
+
+## Key Extraction
+
+```ts
+type Keys = keyof User;
+// type Keys = "name" | "age" | "isAdmin"
+
+type Values = User[keyof User];
+// type Values = string | number | boolean
+
+// Is Equal to:
+type ValueOf<T> = T[keyof T];
+type UserValues = ValueOf<User>;
+// type UserValues = string | number | boolean
+```
+
+## Handling undefined
+
+```ts
+type User = {
+  name: string;
+  age?: number;
+};
+
+// ✅ No need to add age property
+const user: User = {
+  name: "John",
+};
+
+type User = {
+  name: string;
+  age: number | undefined;
+};
+
+// ❌ Age property can be undefined but should be here
+const user: User = {
+  name: "John",
+};
+
+// ✅
+const user: User = {
+  name: "John",
+  age: undefined,
+};
+```
+
+## Combining
+
+```ts
+// keyof (A & B) = (keyof A) | (keyof B)
+
+type A = { a: string };
+type KeyOfA = keyof A; // => 'a'
+
+type B = { b: number };
+type KeyOfB = keyof B; // => 'b'
+
+type C = A & B;
+type KeyOfC = keyof C; // => 'a' | 'b'
+
+// keyof (A | B) = (keyof A) & (keyof B)
+
+type A = { a: string; c: boolean };
+type KeyOfA = keyof A; // => 'a' | 'c'
+
+type B = { b: number; c: boolean };
+type KeyOfB = keyof B; // => 'b' | 'c'
+
+type C = A | B;
+type KeyOfC = keyof C; // => 'c'
 ```
 
 # TypeScript Tips and Tricks
