@@ -72,7 +72,7 @@ These primitive types are the foundation for building more complex types in Type
 - **undefined**: Represents uninitialized variables or missing properties
 
 ```ts
-type Primitive = string | number | boolean | symbol | bigint | null | undefined;
+type Primitive = string | number | boolean | symbol | bigint | null | undefined
 ```
 
 ## Literal Types
@@ -84,7 +84,7 @@ Literal types are more specific versions of primitive types. While primitive typ
 - `null` and `undefined` are literal types that can only hold their respective value
 
 ```ts
-type Literal = "string" | 1 | true | null | undefined;
+type Literal = 'string' | 1 | true | null | undefined
 ```
 
 ## Object Types
@@ -98,7 +98,7 @@ type DataStructures =
   | Record<string, number> // Record type (key-value pairs)
   | [number, boolean] // Tuple type
   | string[] // Array type
-  | Array<number>; // Generic array type
+  | Array<number> // Generic array type
 ```
 
 ## Subtyping
@@ -106,15 +106,15 @@ type DataStructures =
 Subtyping refers to the relationship between types where one type is considered a "subtype" of another type if it can be safely used in place of the other type.
 
 ```ts
-let capybara: "Capybara" = "Capybara";
-let cat: "Cat" = "Cat";
+let capybara: 'Capybara' = 'Capybara'
+let cat: 'Cat' = 'Cat'
 
-let animal: string;
+let animal: string
 
-animal = capybara; // ✅
-animal = cat; // ✅
+animal = capybara // ✅
+animal = cat // ✅
 
-cat = animal; // ❌
+cat = animal // ❌
 
 // capybara is a subtype of "Capibara"
 // cat is a subtype of "Cat"
@@ -149,7 +149,7 @@ Example:
 ```ts
 // Function that throws error returns never
 function throwError(message: string): never {
-  throw new Error(message);
+  throw new Error(message)
 }
 
 // Function with infinite loop returns never
@@ -160,32 +160,32 @@ function infiniteLoop(): never {
 }
 
 // never in exhaustive checks
-type Animal = "dog" | "cat";
+type Animal = 'dog' | 'cat'
 
 function processAnimal(animal: Animal) {
   switch (animal) {
-    case "dog":
-      console.log("woof");
-      break;
-    case "cat":
-      console.log("meow");
-      break;
+    case 'dog':
+      console.log('woof')
+      break
+    case 'cat':
+      console.log('meow')
+      break
     default:
       // This line will error if we forget to handle a case
-      const exhaustiveCheck: never = animal;
+      const exhaustiveCheck: never = animal
   }
 }
 ```
 
 ```ts
 function fail(): never {
-  throw new Error("Something failed");
+  throw new Error('Something failed')
 }
 
-const userName: string = fail(); // ✅
-const userAge: number = fail(); // ✅
-const userIsAdmin: boolean = fail(); // ✅
-const anything: any = fail(); // ✅
+const userName: string = fail() // ✅
+const userAge: number = fail() // ✅
+const userIsAdmin: boolean = fail() // ✅
+const anything: any = fail() // ✅
 ```
 
 ## Any Type
@@ -203,11 +203,11 @@ X & any = any
 Example:
 
 ```ts
-let anything: any = "Hello, world!";
-anything = 42;
-anything = true;
-anything = null;
-anything = undefined;
+let anything: any = 'Hello, world!'
+anything = 42
+anything = true
+anything = null
+anything = undefined
 ```
 
 # Other Types
@@ -270,23 +270,13 @@ Concret example with check French social security number format:
 // 108: birth certificate number (001-999)
 // 185: control key (01-97)
 
-type Gender = 1 | 2;
-type Year = `${number}${number}`;
-type Month = `0${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}` | `1${0 | 1 | 2}`;
+type Gender = 1 | 2
+type Year = `${number}${number}`
+type Month = `0${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}` | `1${0 | 1 | 2}`
 type Department =
   | `0${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
-  | `${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
-      | 0
-      | 1
-      | 2
-      | 3
-      | 4
-      | 5
-      | 6
-      | 7
-      | 8
-      | 9}`;
-type CityCode = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
+  | `${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
+type CityCode = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
   | 0
   | 1
   | 2
@@ -296,18 +286,8 @@ type CityCode = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
   | 6
   | 7
   | 8
-  | 9}${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
-type ControlKey = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
-  | 0
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9}`;
+  | 9}`
+type ControlKey = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
 
 // Using tuple to enforce order and types
 type FrenchSocialSecurityNumber = [
@@ -318,18 +298,10 @@ type FrenchSocialSecurityNumber = [
   cityCode: CityCode,
   birthNumber: CityCode,
   controlKey: ControlKey
-];
+]
 
 // Example usage:
-const validNumber: FrenchSocialSecurityNumber = [
-  1,
-  "89",
-  "02",
-  "75",
-  "108",
-  "108",
-  "85",
-];
+const validNumber: FrenchSocialSecurityNumber = [1, '89', '02', '75', '108', '108', '85']
 ```
 
 ## Array Type
@@ -338,80 +310,61 @@ Arrays in TypeScript are flexible collections that can hold elements of a specif
 
 ```ts
 // Basic examples
-type Basic1 = string[];
-type Basic2 = Array<string>;
-type Basic3 = (0 | 1 | 2)[];
+type Basic1 = string[]
+type Basic2 = Array<string>
+type Basic3 = (0 | 1 | 2)[]
 
 // Get type of element
-type Example = boolean[];
-type Example2 = Example[number]; // type Example2 = boolean
+type Example = boolean[]
+type Example2 = Example[number] // type Example2 = boolean
 ```
 
 ## Array / Tuple (Hybrid)
 
 ```ts
 // number[] that starts with 0
-type PhoneNumber = [0, ...number[]];
+type PhoneNumber = [0, ...number[]]
 
 // string[] that ends with a `?`
-type Question = [...string[], "?"];
+type Question = [...string[], '?']
 
 // non-empty list of strings
-type NonEmpty = [string, ...string[]];
+type NonEmpty = [string, ...string[]]
 
 // starts and ends with a zero
-type Padded = [0, ...number[], 0];
+type Padded = [0, ...number[], 0]
 ```
 
 Concret example with hybrid type (tuple + array):
 
 ```ts
-type User = [
-  name: string,
-  email: string,
-  phone?: number,
-  ...addresses: string[]
-];
+type User = [name: string, email: string, phone?: number, ...addresses: string[]]
 
 const createUser = (...args: User) => {
-  const [name, email, phone, ...addresses] = args;
+  const [name, email, phone, ...addresses] = args
 
   // Logic...
-};
+}
 
-createUser(
-  "Jack",
-  "jack@example.com",
-  1234567890,
-  "1 rue du Chat",
-  "75001 Paris"
-); // ✅
-createUser("Alice", "alice@example.com"); // ✅ `phone` is optional and addresses can be empty.
-createUser(
-  "Alice",
-  "alice@example.com",
-  undefined,
-  "1 rue du Chat",
-  "75001 Paris"
-); // ✅ `phone` should be 0 or undefined (for a number) to specify next parameters.
-createUser("Branda", "branda@example.com", false); // ❌ Argument of type 'boolean' is not assignable to parameter of type 'number'
+createUser('Jack', 'jack@example.com', 1234567890, '1 rue du Chat', '75001 Paris') // ✅
+createUser('Alice', 'alice@example.com') // ✅ `phone` is optional and addresses can be empty.
+createUser('Alice', 'alice@example.com', undefined, '1 rue du Chat', '75001 Paris') // ✅ `phone` should be 0 or undefined (for a number) to specify next parameters.
+createUser('Branda', 'branda@example.com', false) // ❌ Argument of type 'boolean' is not assignable to parameter of type 'number'
 ```
 
 Another example with shared type:
 
 ```ts
-type UserName =
-  | [firstName: string, lastName: string]
-  | [firstName: string, middleName: string, lastName: string];
+type UserName = [firstName: string, lastName: string] | [firstName: string, middleName: string, lastName: string]
 
 const createUser = (...name: UserName) => {
   // Logic...
-};
+}
 
-createUser("John", "Doe"); // ✅
-createUser("John", "Doe", "Smith"); // ✅
-createUser("John"); // ❌ Too less parameters. Need 2 or 3 parameters only
-createUser("John", "Doe", "Smith", "Baker"); // ❌ Too many parameters. Need 2 or 3 parameters only
+createUser('John', 'Doe') // ✅
+createUser('John', 'Doe', 'Smith') // ✅
+createUser('John') // ❌ Too less parameters. Need 2 or 3 parameters only
+createUser('John', 'Doe', 'Smith', 'Baker') // ❌ Too many parameters. Need 2 or 3 parameters only
 ```
 
 # Union and Intersection
@@ -420,40 +373,40 @@ Union types allow a value to be one of several types (using `|`), while intersec
 
 ```ts
 // type Union = A | B
-type Union = "string" | 1 | true | null | undefined;
+type Union = 'string' | 1 | true | null | undefined
 
 // type Intersection = A & B
-type Intersection = { name: string } & { age: number };
+type Intersection = { name: string } & { age: number }
 ```
 
 ## Accessibility Rules
 
 ```ts
 type User = {
-  name: string;
-  age: number;
-  isAdmin: boolean;
-};
+  name: string
+  age: number
+  isAdmin: boolean
+}
 
 const jack: User = {
-  name: "Jack",
+  name: 'Jack',
   age: 25,
-  isAdmin: false,
-};
+  isAdmin: false
+}
 
 const john = {
-  name: "John",
+  name: 'John',
   age: 30,
   isAdmin: true,
-  extraProperty: "extra",
-};
+  extraProperty: 'extra'
+}
 
 // Allows extra properties
-const admin: User = john;
-admin.extraProperty; // ❌ Property 'extraProperty' does not exist on type 'User'.
+const admin: User = john
+admin.extraProperty // ❌ Property 'extraProperty' does not exist on type 'User'.
 
 // But exist in the object
-console.log(admin.extraProperty);
+console.log(admin.extraProperty)
 //  Return
 // {
 //   "name": "John",
@@ -467,24 +420,24 @@ console.log(admin.extraProperty);
 
 ```ts
 // type NameOrAge = User["name" | "age"]
-type NameOrAge = User["name"] | User["age"];
+type NameOrAge = User['name'] | User['age']
 
-type Age = User["age"];
-type Role = User["isAdmin"];
+type Age = User['age']
+type Role = User['isAdmin']
 ```
 
 ## Key Extraction
 
 ```ts
-type Keys = keyof User;
+type Keys = keyof User
 // type Keys = "name" | "age" | "isAdmin"
 
-type Values = User[keyof User];
+type Values = User[keyof User]
 // type Values = string | number | boolean
 
 // Is Equal to:
-type ValueOf<T> = T[keyof T];
-type UserValues = ValueOf<User>;
+type ValueOf<T> = T[keyof T]
+type UserValues = ValueOf<User>
 // type UserValues = string | number | boolean
 ```
 
@@ -492,30 +445,30 @@ type UserValues = ValueOf<User>;
 
 ```ts
 type User = {
-  name: string;
-  age?: number;
-};
+  name: string
+  age?: number
+}
 
 // ✅ No need to add age property
 const user: User = {
-  name: "John",
-};
+  name: 'John'
+}
 
 type User = {
-  name: string;
-  age: number | undefined;
-};
+  name: string
+  age: number | undefined
+}
 
 // ❌ Age property can be undefined but should be here
 const user: User = {
-  name: "John",
-};
+  name: 'John'
+}
 
 // ✅
 const user: User = {
-  name: "John",
-  age: undefined,
-};
+  name: 'John',
+  age: undefined
+}
 ```
 
 ## Combining
@@ -523,25 +476,25 @@ const user: User = {
 ```ts
 // keyof (A & B) = (keyof A) | (keyof B)
 
-type A = { a: string };
-type KeyOfA = keyof A; // => 'a'
+type A = { a: string }
+type KeyOfA = keyof A // => 'a'
 
-type B = { b: number };
-type KeyOfB = keyof B; // => 'b'
+type B = { b: number }
+type KeyOfB = keyof B // => 'b'
 
-type C = A & B;
-type KeyOfC = keyof C; // => 'a' | 'b'
+type C = A & B
+type KeyOfC = keyof C // => 'a' | 'b'
 
 // keyof (A | B) = (keyof A) & (keyof B)
 
-type A = { a: string; c: boolean };
-type KeyOfA = keyof A; // => 'a' | 'c'
+type A = { a: string; c: boolean }
+type KeyOfA = keyof A // => 'a' | 'c'
 
-type B = { b: number; c: boolean };
-type KeyOfB = keyof B; // => 'b' | 'c'
+type B = { b: number; c: boolean }
+type KeyOfB = keyof B // => 'b' | 'c'
 
-type C = A | B;
-type KeyOfC = keyof C; // => 'c'
+type C = A | B
+type KeyOfC = keyof C // => 'c'
 ```
 
 # Helper/Utility Types
@@ -553,19 +506,19 @@ TypeScript provides several built-in utility types that help you manipulate and 
 ```ts
 // Record<K, T>
 
-type PaymentStatus = Record<string, boolean>;
+type PaymentStatus = Record<string, boolean>
 // Equal to:
-type PaymentStatus = { [key: string]: boolean };
+type PaymentStatus = { [key: string]: boolean }
 ```
 
 ```ts
-type PaymentStatus = Record<"free" | "paid", boolean>;
+type PaymentStatus = Record<'free' | 'paid', boolean>
 // These are equivalent:
-type PaymentStatus = { free: boolean; paid: boolean };
-type PaymentStatus = { [Key in "free" | "paid"]: boolean };
+type PaymentStatus = { free: boolean; paid: boolean }
+type PaymentStatus = { [Key in 'free' | 'paid']: boolean }
 
 // Can access to keys like this:
-type ValueType = PaymentStatus[string];
+type ValueType = PaymentStatus[string]
 // type ValueType = boolean
 ```
 
@@ -575,15 +528,15 @@ type ValueType = PaymentStatus[string];
 // Partial<T>
 
 type User = {
-  name: string;
-  age: number;
-  isAdmin: boolean;
-};
+  name: string
+  age: number
+  isAdmin: boolean
+}
 
-type PartialUser = Partial<User>;
+type PartialUser = Partial<User>
 // type PartialUser = { name?: string; age?: number; isAdmin?: boolean }
 
-type PartialUser = Partial<User, "name" | "age">;
+type PartialUser = Partial<User, 'name' | 'age'>
 // type PartialUser = { name?: string; age?: number }
 ```
 
@@ -592,12 +545,12 @@ type PartialUser = Partial<User, "name" | "age">;
 ```ts
 // Required<T>
 
-type User = { name?: string; age?: number; isAdmin?: boolean };
+type User = { name?: string; age?: number; isAdmin?: boolean }
 
-type RequiredUser = Required<User>;
+type RequiredUser = Required<User>
 // type RequiredUser = { name: string; age: number; isAdmin: boolean }
 
-type RequiredUser = Required<User, "name" | "age">;
+type RequiredUser = Required<User, 'name' | 'age'>
 // type RequiredUser = { name: string; age: number }
 ```
 
@@ -606,9 +559,9 @@ type RequiredUser = Required<User, "name" | "age">;
 ```ts
 // Pick<T, K>
 
-type User = { name: string; age: number; isAdmin: boolean };
+type User = { name: string; age: number; isAdmin: boolean }
 
-type PickUser = Pick<User, "name" | "age">;
+type PickUser = Pick<User, 'name' | 'age'>
 // type PickUser = { name: string; age: number }
 ```
 
@@ -617,9 +570,9 @@ type PickUser = Pick<User, "name" | "age">;
 ```ts
 // Omit<T, K>
 
-type User = { name: string; age: number; isAdmin: boolean };
+type User = { name: string; age: number; isAdmin: boolean }
 
-type OmitUser = Omit<User, "isAdmin">;
+type OmitUser = Omit<User, 'isAdmin'>
 // type OmitUser = { name: string; age: number }
 ```
 
@@ -629,12 +582,12 @@ type OmitUser = Omit<User, "isAdmin">;
 
 ```ts
 enum Categories {
-  Nature = "nature",
-  Science = "science",
-  Economy = "economy",
+  Nature = 'nature',
+  Science = 'science',
+  Economy = 'economy'
 }
 
-type Category = keyof typeof Categories;
+type Category = keyof typeof Categories
 // type Category = "Nature" | "Science" | "Economy"
 ```
 
@@ -643,36 +596,34 @@ type Category = keyof typeof Categories;
 Instead of create primitive type manually like:
 
 ```ts
-type Status = "paid" | "free";
+type Status = 'paid' | 'free'
 
-let productStatus: Status;
+let productStatus: Status
 
-productStatus = "paid"; // ✅
-productStatus = "free"; // ✅
-productStatus = "something"; // ❌ Type '"something"' is not assignable to type 'Status'.
+productStatus = 'paid' // ✅
+productStatus = 'free' // ✅
+productStatus = 'something' // ❌ Type '"something"' is not assignable to type 'Status'.
 ```
 
 You can dynamically create a type from a function's return type:
 
 ```ts
 const getPaidStatus = () => {
-  return "paid" as const;
-};
+  return 'paid' as const
+}
 
 const getFreeStatus = () => {
-  return "free" as const;
-};
+  return 'free' as const
+}
 
-type Status =
-  | ReturnType<typeof getPaidStatus>
-  | ReturnType<typeof getFreeStatus>;
+type Status = ReturnType<typeof getPaidStatus> | ReturnType<typeof getFreeStatus>
 // equal to: type Status = "paid" | "free"
 
-let productStatus: Status;
+let productStatus: Status
 
-productStatus = "paid"; // ✅
-productStatus = "free"; // ✅
-productStatus = "something"; // ❌ Type '"something"' is not assignable to type 'Status'.
+productStatus = 'paid' // ✅
+productStatus = 'free' // ✅
+productStatus = 'something' // ❌ Type '"something"' is not assignable to type 'Status'.
 ```
 
 ## Stronger Types with Branded Types and Type Aliases
@@ -684,44 +635,43 @@ Example:
 
 ```ts
 // Define two types for ProductId and OrderId that are branded with a unique symbol but different brand
-type ProductId = string & { readonly __brand: unique symbol };
-type OrderId = string & { readonly __brand: unique symbol };
+type ProductId = string & { readonly __brand: unique symbol }
+type OrderId = string & { readonly __brand: unique symbol }
 
 // Create functions to safely create these types
-const createProductId = (id: string): ProductId => id as ProductId;
-const createOrderId = (id: string): OrderId => id as OrderId;
+const createProductId = (id: string): ProductId => id as ProductId
+const createOrderId = (id: string): OrderId => id as OrderId
 
-const processProduct = (id: ProductId) =>
-  console.log(`Processing product: ${id}`);
-const processOrder = (id: OrderId) => console.log(`Processing order: ${id}`);
+const processProduct = (id: ProductId) => console.log(`Processing product: ${id}`)
+const processOrder = (id: OrderId) => console.log(`Processing order: ${id}`)
 
 // Example usage
-const ProductId = createProductId("product123");
-const orderId = createOrderId("order123");
+const ProductId = createProductId('product123')
+const orderId = createOrderId('order123')
 
-processProduct(ProductId); // ✅ OK
-processOrder(orderId); // ✅ OK
+processProduct(ProductId) // ✅ OK
+processOrder(orderId) // ✅ OK
 
 // These will cause type errors
-processProduct(orderId); // ❌ Type 'OrderId' is not assignable to parameter of type 'ProductId'
-processOrder(ProductId); // ❌ Type 'ProductId' is not assignable to parameter of type 'OrderId'
-processProduct("product123"); // ❌ Type 'string' is not assignable to parameter of type 'ProductId'
+processProduct(orderId) // ❌ Type 'OrderId' is not assignable to parameter of type 'ProductId'
+processOrder(ProductId) // ❌ Type 'ProductId' is not assignable to parameter of type 'OrderId'
+processProduct('product123') // ❌ Type 'string' is not assignable to parameter of type 'ProductId'
 ```
 
 ## Extract keys by value type
 
 ```ts
 type ExtractKeysByValue<T, V> = {
-  [K in keyof T]: T[K] extends V ? K : never;
-}[keyof T];
+  [K in keyof T]: T[K] extends V ? K : never
+}[keyof T]
 
 type Product = {
-  id: number;
-  description: string;
-  price: number;
-};
+  id: number
+  description: string
+  price: number
+}
 
-type ProductKeys = ExtractKeysByValue<Product, string>;
+type ProductKeys = ExtractKeysByValue<Product, string>
 // type ProductKeys = "description"
 ```
 
@@ -733,27 +683,27 @@ Example:
 
 ```ts
 // Example with multiple conditions
-type MediaType<T> = T extends { type: "image" }
+type MediaType<T> = T extends { type: 'image' }
   ? { url: string; width: number; height: number }
-  : T extends { type: "video" }
+  : T extends { type: 'video' }
   ? { url: string; duration: number }
-  : never;
+  : never
 
 // Usage:
-const image: MediaType<{ type: "image" }> = {
-  url: "photo.jpg",
+const image: MediaType<{ type: 'image' }> = {
+  url: 'photo.jpg',
   width: 1920,
-  height: 1080,
-}; // ✅
+  height: 1080
+} // ✅
 
-const video: MediaType<{ type: "video" }> = {
-  url: "video.mp4",
-  duration: 120,
-}; // ✅
+const video: MediaType<{ type: 'video' }> = {
+  url: 'video.mp4',
+  duration: 120
+} // ✅
 
-const audio: MediaType<{ type: "audio" }> = {
-  url: "audio.mp3",
-}; // ❌ Type 'never' has no properties
+const audio: MediaType<{ type: 'audio' }> = {
+  url: 'audio.mp3'
+} // ❌ Type 'never' has no properties
 ```
 
 ## XOR Operator
@@ -762,36 +712,31 @@ The XOR (exclusive OR) operator can be used to create a type that have exactly o
 
 ```ts
 // Without marks all properties from one type as optional and never when they exist in the other type
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never }
 
-type XOR<T, U> = T | U extends object
-  ? (Without<T, U> & U) | (Without<U, T> & T)
-  : T | U;
+type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U
 
-type User = { name: string } & XOR<
-  { isAdmin: true; adminKey: string },
-  { isAdmin: false }
->;
+type User = { name: string } & XOR<{ isAdmin: true; adminKey: string }, { isAdmin: false }>
 
 const jack: User = {
-  name: "Jack",
-  isAdmin: false,
-}; // ✅
+  name: 'Jack',
+  isAdmin: false
+} // ✅
 
 const admin: User = {
-  name: "Admin",
+  name: 'Admin',
   isAdmin: true,
-  adminKey: "XXxxXXxxXXxx",
-}; // ✅
+  adminKey: 'XXxxXXxxXXxx'
+} // ✅
 
 const badUser: User = {
-  name: "John",
-}; // ❌ Type '{ name: string; }' is missing the following properties from type '{ isAdmin: true; adminKey: string; }': isAdmin, adminKey
+  name: 'John'
+} // ❌ Type '{ name: string; }' is missing the following properties from type '{ isAdmin: true; adminKey: string; }': isAdmin, adminKey
 
 const badAdmin: User = {
-  name: "Admin",
-  isAdmin: true,
-}; // ❌ Property 'adminKey' is missing in type '{ name: string; isAdmin: true; }' but required in type '{ isAdmin: true; adminKey: string; }
+  name: 'Admin',
+  isAdmin: true
+} // ❌ Property 'adminKey' is missing in type '{ name: string; isAdmin: true; }' but required in type '{ isAdmin: true; adminKey: string; }
 ```
 
 ## Check data with asserts condition
@@ -801,44 +746,40 @@ The `asserts` condition provides a safer way to narrow types by throwing an erro
 Example:
 
 ```ts
-type User = { name: string; email: string };
+type User = { name: string; email: string }
 
 // Type assertion function that validates an unknown input is a User
 // This function will throw an error if the input is not a valid User
 
 // Keep in mind that: arrow functions can't be used for assertion
 function assertUser(input: unknown): asserts input is User {
-  if (!input || typeof input !== "object") {
-    throw new Error("Input data are missing or not an object!");
+  if (!input || typeof input !== 'object') {
+    throw new Error('Input data are missing or not an object!')
   }
 
-  if (!("name" in input) || typeof input.name !== "string") {
-    throw new Error("Username is missing!");
+  if (!('name' in input) || typeof input.name !== 'string') {
+    throw new Error('Username is missing!')
   }
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-  if (
-    !("email" in input) ||
-    typeof input.email !== "string" ||
-    !emailPattern.test(input.email)
-  ) {
-    throw new Error("Use email should be valid!");
+  if (!('email' in input) || typeof input.email !== 'string' || !emailPattern.test(input.email)) {
+    throw new Error('Use email should be valid!')
   }
 }
 
 const createUser = (input: unknown) => {
   // At this point input type is unknown
-  assertUser(input);
+  assertUser(input)
 
   // After assertion passes, TypeScript knows input is a valid User
-  console.log(`Name: ${input.name}, Email: ${input.email}`); // Name: Jack, Email: jack@example.com
-};
+  console.log(`Name: ${input.name}, Email: ${input.email}`) // Name: Jack, Email: jack@example.com
+}
 
 // Example usage:
-createUser({ name: "Jack", email: "jack@example.com" }); // ✅ OK - Valid user object
-createUser({ name: "Jack", email: "unvalid.com" }); // ❌ Use email should be valid!
-createUser({ email: "jack@example.com" }); // ❌ Username is missing!
+createUser({ name: 'Jack', email: 'jack@example.com' }) // ✅ OK - Valid user object
+createUser({ name: 'Jack', email: 'unvalid.com' }) // ❌ Use email should be valid!
+createUser({ email: 'jack@example.com' }) // ❌ Username is missing!
 ```
 
 # Generic Tips and Tricks
@@ -850,14 +791,14 @@ Old way:
 ```javascript
 const getJsonData = async () => {
   try {
-    const response = await fetch("https://api.example.com/data");
-    const jsonData = await response.json();
+    const response = await fetch('https://api.example.com/data')
+    const jsonData = await response.json()
 
-    return jsonData;
+    return jsonData
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
-};
+}
 ```
 
 Possible way:
@@ -887,14 +828,14 @@ const getJsonData = async () => {
 ## Logical Assignment Operators
 
 ```javascript
-const obj = { a: 10, b: 0, c: 1 };
+const obj = { a: 10, b: 0, c: 1 }
 
-obj.z ??= 40; // if z is null or undefined, set z to 40
-console.log(obj); // { a: 10, b: 0, c: 1, z: 40 }
+obj.z ??= 40 // if z is null or undefined, set z to 40
+console.log(obj) // { a: 10, b: 0, c: 1, z: 40 }
 
-obj.b ||= 20; // if b is false, set b to 20
-console.log(obj); // { a: 10, b: 20, c: 1, z: 40 }
+obj.b ||= 20 // if b is false, set b to 20
+console.log(obj) // { a: 10, b: 20, c: 1, z: 40 }
 
-obj.c &&= 30; // if c is true or have value, set c to 30
-console.log(obj); // { a: 10, b: 20, c: 30, z: 40 }
+obj.c &&= 30 // if c is true or have value, set c to 30
+console.log(obj) // { a: 10, b: 20, c: 30, z: 40 }
 ```
