@@ -16,6 +16,7 @@
   - [Any Type](#any-type)
 - [Other Types](#other-types)
   - [Tuple Type](#tuple-type)
+  - [Array Type](#array-type)
 - [Union and Intersection](#union-and-intersection)
   - [Accessibility Rules](#accessibility-rules)
   - [Accessing Properties](#accessing-properties)
@@ -328,6 +329,21 @@ const validNumber: FrenchSocialSecurityNumber = [
   "108",
   "85",
 ];
+```
+
+## Array Type
+
+Arrays in TypeScript are flexible collections that can hold elements of a specific type, denoted using either `Type[]` or `Array<Type>` syntax.
+
+```ts
+// Basic examples
+type Basic1 = string[];
+type Basic2 = Array<string>;
+type Basic3 = (0 | 1 | 2)[];
+
+// Get type of element
+type Example = boolean[];
+type Example2 = Example[number]; // type Example2 = boolean
 ```
 
 # Union and Intersection
