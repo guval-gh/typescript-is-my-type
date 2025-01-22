@@ -17,6 +17,7 @@
 - [Other Types](#other-types)
   - [Tuple Type](#tuple-type)
   - [Array Type](#array-type)
+  - [Array / Tuple (Hybrid)](#array-tuple-hybrid)
 - [Union and Intersection](#union-and-intersection)
   - [Accessibility Rules](#accessibility-rules)
   - [Accessing Properties](#accessing-properties)
@@ -344,6 +345,73 @@ type Basic3 = (0 | 1 | 2)[];
 // Get type of element
 type Example = boolean[];
 type Example2 = Example[number]; // type Example2 = boolean
+```
+
+## Array / Tuple (Hybrid)
+
+```ts
+// number[] that starts with 0
+type PhoneNumber = [0, ...number[]];
+
+// string[] that ends with a `?`
+type Question = [...string[], "?"];
+
+// non-empty list of strings
+type NonEmpty = [string, ...string[]];
+
+// starts and ends with a zero
+type Padded = [0, ...number[], 0];
+```
+
+Concret example with hybrid type (tuple + array):
+
+```ts
+type User = [
+  name: string,
+  email: string,
+  phone?: number,
+  ...addresses: string[]
+];
+
+const createUser = (...args: User) => {
+  const [name, email, phone, ...addresses] = args;
+
+  // Logic...
+};
+
+createUser(
+  "Jack",
+  "jack@example.com",
+  1234567890,
+  "1 rue du Chat",
+  "75001 Paris"
+); // ✅
+createUser("Alice", "alice@example.com"); // ✅ `phone` is optional and addresses can be empty.
+createUser(
+  "Alice",
+  "alice@example.com",
+  undefined,
+  "1 rue du Chat",
+  "75001 Paris"
+); // ✅ `phone` should be 0 or undefined (for a number) to specify next parameters.
+createUser("Branda", "branda@example.com", false); // ❌ Argument of type 'boolean' is not assignable to parameter of type 'number'
+```
+
+Another example with shared type:
+
+```ts
+type UserName =
+  | [firstName: string, lastName: string]
+  | [firstName: string, middleName: string, lastName: string];
+
+const createUser = (...name: UserName) => {
+  // Logic...
+};
+
+createUser("John", "Doe"); // ✅
+createUser("John", "Doe", "Smith"); // ✅
+createUser("John"); // ❌ Too less parameters. Need 2 or 3 parameters only
+createUser("John", "Doe", "Smith", "Baker"); // ❌ Too many parameters. Need 2 or 3 parameters only
 ```
 
 # Union and Intersection
