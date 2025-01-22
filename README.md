@@ -14,6 +14,8 @@
   - [Unknown Type](#unknown-type)
   - [Never Type](#never-type)
   - [Any Type](#any-type)
+- [Other Types](#other-types)
+  - [Tuple Type](#tuple-type)
 - [Union and Intersection](#union-and-intersection)
   - [Accessibility Rules](#accessibility-rules)
   - [Accessing Properties](#accessing-properties)
@@ -204,6 +206,128 @@ anything = 42;
 anything = true;
 anything = null;
 anything = undefined;
+```
+
+# Other Types
+
+## Tuple Type
+
+A tuple type is a fixed-length array where each element can have a specific type, allowing you to define an array with a known number of elements of different types.
+
+```ts
+// Basic example
+type Tuple = [number, string, boolean];
+const tuple: Tuple = [1, "hello", true];
+
+// Create literal type from Tuple
+type FullName = ["John", "Doe"];
+type FirstName = FullName[0]; // type FirstName = "John"
+type LastName = FullName[1]; // type LastName = "Doe"
+
+// Create type from Tuple (types or values)
+type User = { name: string; isAdmin: boolean };
+type NameOrAdmin = User["name" | "isAdmin"]; // type NameOrAdmin = string | boolean
+
+type UserTuple = ["John", "Doe", false]
+type NameOrAdminBis = UserTuple[0 | 2]; // type NameOrAdminBis = "John" | false
+
+// When using keyof on a tuple/array type, it returns:
+// - The numeric indices as string literals ("0", "1", etc.)
+// - All the built-in array methods and properties ("length", "map", "filter", etc.)
+type Keys = keyof ["John", false] // type Keys = keyof ["John", false] = "0" | "1" | "length" | "pop" | "push" | "concat" | "join" | "reverse" | "shift" | "slice" | "sort" | etc.
+
+// Combining/Merging Tuples
+type Tuple1 = [1, 2, 3]
+type Tuple2 = [4, 5, 6]
+type Tuple3 = [...Tuple1, ...Tuple2] // type Tuple3 = [1, 2, 3, 4, 5, 6]
+type Tuple4 = Tuple1 & Tuple2 // type Tuple4 = [1, 2, 3, 4, 5, 6]
+
+// Create Tuple with named index (optionnal)
+type User1 = [name: string; email: string]
+// Equal to:
+type User2 = [string, string]
+
+// Create Tuple with the last parameter/index optionnal
+type User2 = [string, string?]
+
+// All const created are valid ✅
+const user: User2 = ["John", "john@example.com"]
+const user: User2 = ["John"]
+const user: User2 = ["John", undefined]
+```
+
+Concret example with check French social security number format:
+
+```ts
+// French social security number format: 1 + 89 + 02 + 75 + 108 + 108 + 185
+// 1: gender (1 or 2)
+// 89: year of birth (00-99)
+// 02: month of birth (01-12)
+// 75: department (01-99)
+// 108: city code (001-999)
+// 108: birth certificate number (001-999)
+// 185: control key (01-97)
+
+type Gender = 1 | 2;
+type Year = `${number}${number}`;
+type Month = `0${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}` | `1${0 | 1 | 2}`;
+type Department =
+  | `0${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`
+  | `${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
+      | 0
+      | 1
+      | 2
+      | 3
+      | 4
+      | 5
+      | 6
+      | 7
+      | 8
+      | 9}`;
+type CityCode = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
+  | 0
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9}${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
+type ControlKey = `${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${
+  | 0
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9}`;
+
+// Using tuple to enforce order and types
+type FrenchSocialSecurityNumber = [
+  gender: Gender,
+  year: Year,
+  month: Month,
+  department: Department,
+  cityCode: CityCode,
+  birthNumber: CityCode,
+  controlKey: ControlKey
+];
+
+// Example usage:
+const validNumber: FrenchSocialSecurityNumber = [
+  1,
+  "89",
+  "02",
+  "75",
+  "108",
+  "108",
+  "85",
+];
 ```
 
 # Union and Intersection
