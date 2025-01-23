@@ -36,6 +36,8 @@
   - [Infer Types](#infer-types)
   - [Extract Type with Infer](#extract-type-with-infer)
   - [Check with Tuple](#check-with-tuple)
+- [Iterative and Loop Methods](#iterative-and-loop-methods)
+  - [Find() loop like](#find-loop-like)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -743,6 +745,65 @@ type OR<A extends boolean, B extends boolean> = [A, B] extends [false, false] ? 
 type NOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] ? true : false
 type XOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] | [true, true] ? false : true
 type XNOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] | [true, true] ? true : false
+```
+
+# Iterative and Loop Methods
+
+## Find() loop like
+
+```ts
+type Column = {
+  name: string
+  values: unknown[]
+}
+
+type Table = [Column, ...Column[]]
+
+type StudentTable = [
+  { name: 'studentId'; values: number[] },
+  { name: 'grades'; values: number[] },
+  { name: 'enrolled'; values: Date[] }
+]
+
+const students: StudentTable = [
+  { name: 'studentId', values: [1001, 1002, 1003] },
+  { name: 'grades', values: [85, 92, 78] },
+  { name: 'enrolled', values: [new Date('2023-01-01'), new Date('2023-01-15'), new Date('2023-02-01')] }
+]
+
+// type Loop<List /* ... other params */> =
+//   // 1. Split the list:
+//   List extends [infer First, ...infer Rest]
+//     ? // 2. Compute something using the first element.
+//       //    Maybe recurse on the `Rest`:
+//       Loop<Rest /* ... modified params */>
+//     : // 3. Return a default type if the list is empty:
+//       SomeDefault;
+type GetColumn<List, Name> = List extends [infer First, ...infer Rest]
+  ? First extends { name: Name; values: infer Values }
+    ? Values
+    : GetColumn<Rest, Name>
+  : undefined
+
+declare const getColumn: <T extends Table, N extends string>(table: T, columnName: N) => GetColumn<T, N>
+
+type Result1 = GetColumn<StudentTable, 'studentId'> // number[]
+type Result2 = GetColumn<StudentTable, 'enrolled'> // Date[]
+
+const ids = getColumn(students, 'studentId')
+// `ids` is inferred as `number[]`
+
+const enrollmentDates = getColumn(students, 'enrolled')
+// `enrollmentDates` is inferred as `Date[]`
+
+declare const courses: [
+  { name: 'courseCode'; values: string[] },
+  { name: 'credits'; values: number[] },
+  { name: 'schedule'; values: [day: string, time: string][] }
+]
+
+const schedules = getColumn(courses, 'schedule') // [day: string, time: string][]
+const invalid = getColumn(courses, 'invalid') // undefined
 ```
 
 # TypeScript Tips and Tricks
