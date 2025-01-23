@@ -33,6 +33,9 @@
 - [Conditional Types](#conditional-types)
   - [Nested conditions](#nested-conditions)
   - [Type Constraints](#type-constraints)
+  - [Infer Types](#infer-types)
+  - [Extract Type with Infer](#extract-type-with-infer)
+  - [Check with Tuple](#check-with-tuple)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -671,6 +674,75 @@ const user2 = hasAllowedToEdit('pro', 'editor') // ✅ true
 const user3 = hasAllowedToEdit('basic', 'admin') // ❌ false
 const user4 = hasAllowedToEdit('premium', 'admin') // ✅ true
 const user5 = hasAllowedToEdit('pro', 'viewer') // ❌ false
+```
+
+## Infer Types
+
+```ts
+// Define possible roles
+type Role = 'Admin' | 'Editor' | 'Viewer'
+
+// Define user type
+type User = {
+  name: string
+  role: Role
+}
+
+// Extract role from user type
+type GetRole<User> = User extends { name: string; role: infer Role } ? Role : never
+
+// Example usage:
+const user1: User = { name: 'John', role: 'Admin' }
+const user2 = { name: 'Bob' }
+
+// Function that uses GetRole
+const getUserRole = <U extends unknown>(user: U): GetRole<U> => {
+  return (user as any).role
+}
+
+const johnRole = getUserRole(user1) // johnRole is "Admin"
+const bobRole = getUserRole(user2) // bobRole is never
+```
+
+## Extract Type with Infer
+
+```ts
+// Extract Parameters and Return types from function
+type GetParametersType<F> = F extends (...params: infer P) => any ? P : never
+type GetReturnType<F> = F extends (...params: any[]) => infer R ? R : never
+
+type Fn = (name: string, id: number) => boolean
+
+type ParametersType = GetParametersType<Fn> // type ParametersType = [name: string, id: number]
+type ReturnedType = GetReturnType<Fn> // type ReturnedType = boolean
+
+// Extract type from Generic Type
+type GenericType<A, B> = { content: A; children: B[] }
+type ExtractParams<S> = S extends GenericType<infer A, infer B> ? [A, B] : never
+type ExtractedType = ExtractParams<GenericType<number, string>> // type ExtractedType = [number, string]
+// Another example
+type ExtractType<T> = T extends Array<infer U> ? U : never
+type ExtractedType = ExtractType<Array<string>> // type ExtractedType = string
+
+// Extract type from last element of array
+type ExtractLastElement<T> = T extends [...infer _Rest, infer Last] ? Last : never
+type ExtractedType = ExtractLastElement<[1, 2, 3, 4, 5]> // type ExtractedType = 5
+
+// Extract type from first element of array
+type ExtractFirstElement<T> = T extends [infer First, ...infer _Rest] ? First : never
+type ExtractedType = ExtractFirstElement<[1, 2, 3, 4, 5]> // type ExtractedType = 1
+```
+
+## Check with Tuple
+
+```ts
+// Examples with logical operators
+type AND<A extends boolean, B extends boolean> = [A, B] extends [true, true] ? true : false
+type NAND<A extends boolean, B extends boolean> = [A, B] extends [true, true] ? false : true
+type OR<A extends boolean, B extends boolean> = [A, B] extends [false, false] ? false : true
+type NOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] ? true : false
+type XOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] | [true, true] ? false : true
+type XNOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] | [true, true] ? true : false
 ```
 
 # TypeScript Tips and Tricks
