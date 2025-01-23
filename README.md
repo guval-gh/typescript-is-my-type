@@ -17,7 +17,7 @@
 - [Other Types](#other-types)
   - [Tuple Type](#tuple-type)
   - [Array Type](#array-type)
-  - [Array / Tuple (Hybrid)](#array-tuple-hybrid)
+  - [Array and Tuple Hybrid](#array-and-tuple-hybrid)
 - [Union and Intersection](#union-and-intersection)
   - [Accessibility Rules](#accessibility-rules)
   - [Accessing Properties](#accessing-properties)
@@ -30,6 +30,9 @@
   - [Required](#required)
   - [Pick](#pick)
   - [Omit](#omit)
+- [Conditional Types](#conditional-types)
+  - [Nested conditions](#nested-conditions)
+  - [Type Constraints](#type-constraints)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -319,7 +322,7 @@ type Example = boolean[]
 type Example2 = Example[number] // type Example2 = boolean
 ```
 
-## Array / Tuple (Hybrid)
+## Array and Tuple Hybrid
 
 ```ts
 // number[] that starts with 0
@@ -574,6 +577,100 @@ type User = { name: string; age: number; isAdmin: boolean }
 
 type OmitUser = Omit<User, 'isAdmin'>
 // type OmitUser = { name: string; age: number }
+```
+
+# Conditional Types
+
+```ts
+// Basic example
+type IsString<T> = T extends string ? 'yes' : 'no'
+
+type Result1 = IsString<string> // type Result = 'yes'
+type Result2 = IsString<number> // type Result2 = 'no'
+
+// IF example
+type If<C extends boolean, T, F> = C extends true ? T : F
+
+type Result1 = If<true, 'yes', 'no'> // ✅ type Result3 = 'yes'
+type Result2 = If<false, 'yes', 'no'> // ❌ type Result4 = 'no'
+```
+
+## Nested conditions
+
+```ts
+// Example with nested conditions
+type GetTheme<I extends 0 | 1 | 2> = {
+  0: 'light'
+  1: 'neutral'
+  2: 'dark'
+}[I]
+
+type Theme1 = GetTheme<0> // type Theme = "light"
+type Theme2 = GetTheme<1> // type Theme2 = "neutral"
+type Theme3 = GetTheme<2> // type Theme3 = "dark"
+
+// Example usage in a function
+const getThemeString = <T extends 0 | 1 | 2>(theme: T): GetTheme<T> => {
+  const themes = {
+    0: 'light',
+    1: 'neutral',
+    2: 'dark'
+  } as const
+
+  return themes[theme] as GetTheme<T>
+}
+
+// Usage examples
+const lightTheme = getThemeString(0) // 'light'
+const neutralTheme = getThemeString(1) // 'neutral'
+const darkTheme = getThemeString(2) // 'dark'
+
+// Type safety examples
+const invalidTheme = getThemeString(3) // ❌ Error: Argument of type '3' is not assignable to parameter of type '0 | 1 | 2'
+```
+
+## Type Constraints
+
+```ts
+// Basic example
+// Without constraint
+const createdUser = (name: string) => ({ name })
+const user = createdUser('John') // { name: string }
+// With constraint
+const createdUser = <S extends string>(name: S) => ({ name })
+const userExample = createdUser('John') // { name: John }
+
+// example with tuple
+// with simple constraint
+const inferAsTuple = <T extends any[]>(tuple: T) => tuple
+const t1 = inferAsTuple([1, 2]) // number[]
+const t2 = inferAsTuple(['b', 3, false]) // (string, number, boolean)[]
+// with precise constraint
+const inferAsTuple = <T extends [unknown, ...unknown[]]>(tuple: T) => tuple
+const t1 = inferAsTuple([1, 2]) // [number, number]
+const t2 = inferAsTuple(['b', 3, false]) // [string, number, boolean]
+```
+
+```ts
+// Define available plans and roles
+type Plan = 'basic' | 'pro' | 'premium'
+type Role = 'viewer' | 'editor' | 'admin'
+
+// Type to check if a user with given plan and role can edit
+type CanEdit<P extends Plan, R extends Role> = [P, R] extends ['pro' | 'premium', 'editor' | 'admin'] ? true : false
+
+// Example usage in a function
+const hasAllowedToEdit = <P extends Plan, R extends Role>(plan: P, role: R): boolean => {
+  // Check if plan is pro/premium AND role is editor/admin
+  return true as CanEdit<P, R>
+}
+
+// Usage examples
+const user1 = hasAllowedToEdit('basic', 'editor') // ❌ false
+const user2 = hasAllowedToEdit('pro', 'editor') // ✅ true
+const user3 = hasAllowedToEdit('basic', 'admin') // ❌ false
+const user4 = hasAllowedToEdit('premium', 'admin') // ✅ true
+const user5 = hasAllowedToEdit('pro', 'viewer') // ❌ false
 ```
 
 # TypeScript Tips and Tricks
