@@ -38,6 +38,7 @@
   - [Check with Tuple](#check-with-tuple)
 - [Iterative and Loop Methods](#iterative-and-loop-methods)
   - [Find() loop like](#find-loop-like)
+  - [Map() loop like](#map-loop-like)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -804,6 +805,23 @@ declare const courses: [
 
 const schedules = getColumn(courses, 'schedule') // [day: string, time: string][]
 const invalid = getColumn(courses, 'invalid') // undefined
+```
+
+## Map() loop like
+
+```ts
+// type MapLoop<List> =
+// List extends [infer First, ...infer Rest]
+//   ? [ /* ... your logic */ , ...MapLoop<Rest>]
+//   : [];
+type GetProperty<Person, Prop extends string> = Person extends { [K in Prop]: infer Value } ? Value : 0
+
+type MapProperty<List, Prop extends string> = List extends [infer First, ...infer Rest]
+  ? [GetProperty<First, Prop>, ...MapProperty<Rest, Prop>]
+  : []
+
+type Ages = MapProperty<[{ id: 1; age: 25 }, { id: 2; age: 30 }, { id: 3; age: 28 }], 'age'>
+// => [25, 30, 28]
 ```
 
 # TypeScript Tips and Tricks
