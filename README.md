@@ -26,10 +26,21 @@
   - [Combining](#combining)
 - [Helper/Utility Types](#helperutility-types)
   - [Record](#record)
+  - [Readonly](#readonly)
   - [Partial](#partial)
+  - [Exclude](#exclude)
+  - [Extract](#extract)
   - [Required](#required)
   - [Pick](#pick)
   - [Omit](#omit)
+  - [Awaited](#awaited)
+  - [NonNullable](#nonnullable)
+  - [Parameters](#parameters)
+  - [ConstructorParameters](#constructorparameters)
+  - [ReturnType](#returntype)
+  - [InstanceType](#instancetype)
+  - [NoInfer](#noinfer)
+  - [String Manipulator](#string-manipulator)
 - [Conditional Types](#conditional-types)
   - [Nested conditions](#nested-conditions)
   - [Type Constraints](#type-constraints)
@@ -534,10 +545,25 @@ type ValueType = PaymentStatus[string]
 // type ValueType = boolean
 ```
 
+## ReadOnly
+
+```ts
+// ReadOnly<Type>
+
+type User = {
+  name: string
+  age: number
+  isAdmin: boolean
+}
+
+type ReadOnlyUser = Readonly<User>
+// type ReadOnlyUser = { readonly name: string; readonly age: number; readonly isAdmin: boolean }
+```
+
 ## Partial
 
 ```ts
-// Partial<T>
+// Partial<Type>
 
 type User = {
   name: string
@@ -552,10 +578,32 @@ type PartialUser = Partial<User, 'name' | 'age'>
 // type PartialUser = { name?: string; age?: number }
 ```
 
+## Exclude
+
+```ts
+// Exclude<UnionType, ExcludedMembers>
+
+type User = 'name' | 'age' | 'isAdmin'
+
+type ExcludedUser = Exclude<User, 'isAdmin'>
+// type ExcludedUser = 'name' | 'age'
+```
+
+## Extract
+
+```ts
+// Extract<Type, Union>
+
+type User = 'name' | 'age' | 'isAdmin'
+
+type ExtractedUser = Extract<User, 'name' | 'age'>
+// type ExtractedUser = 'name' | 'age'
+```
+
 ## Required
 
 ```ts
-// Required<T>
+// Required<Type>
 
 type User = { name?: string; age?: number; isAdmin?: boolean }
 
@@ -569,7 +617,7 @@ type RequiredUser = Required<User, 'name' | 'age'>
 ## Pick
 
 ```ts
-// Pick<T, K>
+// Pick<Type, Keys>
 
 type User = { name: string; age: number; isAdmin: boolean }
 
@@ -580,12 +628,127 @@ type PickUser = Pick<User, 'name' | 'age'>
 ## Omit
 
 ```ts
-// Omit<T, K>
+// Omit<Type, Keys>
 
 type User = { name: string; age: number; isAdmin: boolean }
 
 type OmitUser = Omit<User, 'isAdmin'>
 // type OmitUser = { name: string; age: number }
+```
+
+## Awaited
+
+```ts
+// Awaited<Type>
+
+type A = Awaited<Promise<string>> // type A = string
+type B = Awaited<boolean | Promise<number>> // type B = boolean | number
+
+// Example with nested promises
+type C = Awaited<Promise<Promise<Promise<boolean>>>> // type C = boolean
+
+// Example with function that returns a promise
+async function getData() {
+  return { id: 1, name: 'John' }
+}
+
+type D = Awaited<ReturnType<typeof getData>> // type D = { id: number; name: string }
+```
+
+## NonNullable
+
+```ts
+// NonNullable<Type>
+
+type User = { name: string; age: number | null }
+
+type NonNullableUser = NonNullable<User['age']>
+// type NonNullableUser = number
+```
+
+## Parameters
+
+```ts
+// Parameters<Type>
+
+type Fn = (name: string, age: number) => boolean
+
+type FnParameters = Parameters<Fn>
+// type FnParameters = [name: string, age: number]
+```
+
+## ConstructorParameters
+
+```ts
+// ConstructorParameters<Type>
+
+type User = new (name: string, age: number) => boolean
+
+type UserParameters = ConstructorParameters<User>
+// type UserParameters = [name: string, age: number]
+```
+
+## ReturnType
+
+```ts
+// ReturnType<Type>
+
+type Fn = (name: string, age: number) => boolean
+
+type FnReturnType = ReturnType<Fn>
+// type FnReturnType = boolean
+```
+
+## InstanceType
+
+```ts
+// InstanceType<Type>
+
+type User = new (name: string, age: number) => boolean
+
+type UserInstanceType = InstanceType<User>
+// type UserInstanceType = boolean
+```
+
+## NoInfer
+
+```ts
+// NoInfer<Type>
+
+type InferredType<T> = { x: T }
+type HasNoInfer<T> = { x: NoInfer<T> }
+
+// Without NoInfer, TypeScript infers T as string | number
+declare function fn1<T>(obj: InferredType<T>): T
+const x1 = fn1({ x: 1 }) // T inferred as number
+const y1 = fn1({ x: 'hello' }) // T inferred as string
+
+// With NoInfer, TypeScript requires explicit type parameter
+declare function fn2<T>(obj: HasNoInfer<T>): T
+const x2 = fn2<number>({ x: 1 }) // Must specify T as number
+const y2 = fn2<string>({ x: 'hello' }) // Must specify T as string
+```
+
+## String Manipulator
+
+```ts
+// Uppercase<StringType>
+// Lowercase<StringType>
+// Capitalize<StringType>
+// Uncapitalize<StringType>
+
+type UppercaseExample = Uppercase<'hello'> // type UppercaseExample = "HELLO"
+type LowercaseExample = Lowercase<'HELLO'> // type LowercaseExample = "hello"
+type CapitalizeExample = Capitalize<'hello'> // type CapitalizeExample = "Hello"
+type UncapitalizeExample = Uncapitalize<'Hello'> // type UncapitalizeExample = "hello"
+
+// Can be used with template literals
+type Greeting<T extends string> = `${Uppercase<T>} WORLD!`
+type ShoutHello = Greeting<'hello'> // type ShoutHello = "HELLO WORLD!"
+
+// Can be chained together
+type Title = `${Capitalize<Lowercase<'TYPESCRIPT'>>} Guide`
+// type Title = "Typescript Guide"
 ```
 
 # Conditional Types
