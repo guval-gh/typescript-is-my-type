@@ -37,8 +37,10 @@
   - [Extract Type with Infer](#extract-type-with-infer)
   - [Check with Tuple](#check-with-tuple)
 - [Iterative and Loop Methods](#iterative-and-loop-methods)
-  - [Find() loop like](#find-loop-like)
-  - [Map() loop like](#map-loop-like)
+  - [Find loop](#find-loop)
+  - [Map loop](#map-loop)
+  - [Filter loop](#filter-loop)
+  - [Reduce loop](#reduce-loop)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -750,7 +752,7 @@ type XNOR<A extends boolean, B extends boolean> = [A, B] extends [false, false] 
 
 # Iterative and Loop Methods
 
-## Find() loop like
+## Find loop
 
 ```ts
 type Column = {
@@ -786,42 +788,70 @@ type GetColumn<List, Name> = List extends [infer First, ...infer Rest]
     : GetColumn<Rest, Name>
   : undefined
 
-declare const getColumn: <T extends Table, N extends string>(table: T, columnName: N) => GetColumn<T, N>
-
 type Result1 = GetColumn<StudentTable, 'studentId'> // number[]
 type Result2 = GetColumn<StudentTable, 'enrolled'> // Date[]
-
-const ids = getColumn(students, 'studentId')
-// `ids` is inferred as `number[]`
-
-const enrollmentDates = getColumn(students, 'enrolled')
-// `enrollmentDates` is inferred as `Date[]`
-
-declare const courses: [
-  { name: 'courseCode'; values: string[] },
-  { name: 'credits'; values: number[] },
-  { name: 'schedule'; values: [day: string, time: string][] }
-]
-
-const schedules = getColumn(courses, 'schedule') // [day: string, time: string][]
-const invalid = getColumn(courses, 'invalid') // undefined
 ```
 
-## Map() loop like
+## Map loop
 
 ```ts
-// type MapLoop<List> =
+// type Map<List> =
 // List extends [infer First, ...infer Rest]
-//   ? [ /* ... your logic */ , ...MapLoop<Rest>]
+//   ? [ /* ... your logic */ , ...Map<Rest>]
 //   : [];
-type GetProperty<Person, Prop extends string> = Person extends { [K in Prop]: infer Value } ? Value : 0
+type GetProperty<Person, Prop extends string> = Person extends {
+  [K in Prop]: infer Value
+}
+  ? Value
+  : 0
 
 type MapProperty<List, Prop extends string> = List extends [infer First, ...infer Rest]
   ? [GetProperty<First, Prop>, ...MapProperty<Rest, Prop>]
   : []
 
-type Ages = MapProperty<[{ id: 1; age: 25 }, { id: 2; age: 30 }, { id: 3; age: 28 }], 'age'>
-// => [25, 30, 28]
+// Example usage:
+type Person = { id: number; age: number; name: string }
+type People = [{ id: 1; age: 25; name: 'Alice' }, { id: 2; age: 30; name: 'Bob' }, { id: 3; age: 28; name: 'Charlie' }]
+
+type Ages = MapProperty<People, 'age'> // [25, 30, 28]
+type Names = MapProperty<People, 'name'> // ["Alice", "Bob", "Charlie"]
+type Ids = MapProperty<People, 'id'> // [1, 2, 3]
+```
+
+## Filter loop
+
+```ts
+// type Filter<List> =
+// List extends [infer First, ...infer Rest]
+//   ? First extends  /* ... your condition */
+//     ? [First, ...Filter<Rest>]
+//     : Filter<Rest>
+//   : [];
+
+type OnlyStrings<List> = List extends [infer First, ...infer Rest]
+  ? First extends string
+    ? [First, ...OnlyStrings<Rest>]
+    : OnlyStrings<Rest>
+  : []
+
+type Strings = OnlyStrings<[1, 'hello', true, 'world', 42, 'typescript']>
+// type Strings = ["hello", "world", "typescript"]
+```
+
+## Reduce loop
+
+```ts
+// type Reduce<Tuple, Acc = /* ... initial value */> =
+// Tuple extends [infer First, ...infer Rest]
+// ? Reduce<Rest, /* ... logic */>
+// : Acc;
+
+type FromEntries<Entries, Acc = {}> = Entries extends [infer Entry, ...infer Rest]
+  ? FromEntries<Rest, Entry extends [infer Key extends PropertyKey, infer Value] ? Acc & { [K in Key]: Value } : Acc>
+  : Acc
+
+type Product = FromEntries<[['title', 'iPhone'], ['price', 999], ['inStock', true]]>
+// type Product = { title: string; price: number; inStock: boolean }
 ```
 
 # TypeScript Tips and Tricks
