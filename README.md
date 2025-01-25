@@ -41,6 +41,7 @@
   - [Map loop](#map-loop)
   - [Filter loop](#filter-loop)
   - [Reduce loop](#reduce-loop)
+- [Template Literals](#template-literals)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -852,6 +853,104 @@ type FromEntries<Entries, Acc = {}> = Entries extends [infer Entry, ...infer Res
 
 type Product = FromEntries<[['title', 'iPhone'], ['price', 999], ['inStock', true]]>
 // type Product = { title: string; price: number; inStock: boolean }
+```
+
+# Template Literals
+
+Template literals allow you to create string literal types by combining other string literals, numbers, and types.
+
+```ts
+// Basic example
+type World = 'world'
+type Greeting = `hello ${World}` // type Greeting = "hello world"
+```
+
+```ts
+// Example with object keys
+type User = {
+  firstName: string
+  lastName: string
+  age: number
+}
+
+type UserFields = keyof User // "firstName" | "lastName" | "age"
+type UserPaths = `user.${UserFields}` // "user.firstName" | "user.lastName" | "user.age"
+
+// Can create nested paths
+type Nested = {
+  user: {
+    info: {
+      name: string
+      email: string
+    }
+    settings: {
+      theme: string
+      notifications: boolean
+    }
+  }
+}
+
+type NestedPaths = `user.${keyof Nested['user']}.${keyof Nested['user']['info'] | keyof Nested['user']['settings']}`
+// type NestedPaths = "user.info.name" | "user.info.email" | "user.settings.theme" | "user.settings.notifications"
+```
+
+```ts
+// Example with primitive types
+type ID = number | boolean
+type UserID = `user_${ID}` // type UserID = `user_${number}` | `user_${boolean}`
+
+// Another example with check email
+type Email = `${string}@${string}.${string}`
+const email1: Email = 'test@example.com' // ✅
+const email2: Email = 'invalid-email' // ❌ Type '"invalid-email"' is not assignable to type '`${string}@${string}.${string}`'
+```
+
+```ts
+// Unions can be used in template literals
+type Color = 'red' | 'blue'
+type Quantity = 1 | 2
+type Item = `${Quantity} ${Color} items` // type Item = "1 red items" | "1 blue items" | "2 red items" | "2 blue items"
+
+// Another example with creating CSS class names
+type Alignment = 'left' | 'right' | 'center'
+type Size = 'sm' | 'md' | 'lg'
+type ClassName = `align-${Alignment}-${Size}`
+// type ClassName = "align-left-sm" | "align-left-md" | "align-left-lg" | "align-right-sm" | "align-right-md" | "align-right-lg" | "align-center-sm" | "align-center-md" | "align-center-lg"
+```
+
+```ts
+// Template Literals can be used to pattern matching
+type Product = {
+  id: number
+  description: string
+  price: number
+}
+
+type Order = {
+  id: number
+  description: string
+}
+
+type Method = 'GET' | 'PUT'
+type Resource = 'order' | 'product'
+
+type PropName = `${Lowercase<Method>}${Capitalize<Resource>}`
+type HTTPService = Record<PropName, Function>
+
+const httpService = {
+  getOrder: () => Promise.resolve({ id: 1, description: 'Order 1', price: 100 }),
+  putOrder: (order: Order) => Promise.resolve(),
+  getProduct: () => Promise.resolve({ id: 1, description: 'Product 1', price: 100 })
+} satisfies HTTPService // ❌ putProduct function is missing!
+```
+
+```ts
+// Template literals can be used to split strings
+type SplitDomain<Name> = Name extends `${infer Sub}.${infer Domain}.${infer Extension}`
+  ? [Sub, Domain, Extension]
+  : never
+
+type DomainParts = SplitDomain<'www.typescriptlang.org'> // type DomainParts = ["www", "typescriptlang", "org"]
 ```
 
 # TypeScript Tips and Tricks
