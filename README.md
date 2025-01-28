@@ -19,8 +19,9 @@
   - [Array Type](#array-type)
   - [Array and Tuple Hybrid](#array-and-tuple-hybrid)
 - [Union and Intersection](#union-and-intersection)
+  - [Conditional checking](#conditional-checking)
   - [Accessibility Rules](#accessibility-rules)
-  - [Accessing Properties](#accessing-properties)
+  - [Distribution and Accessing Properties](#distribution-and-accessing-properties)
   - [Key Extraction](#key-extraction)
   - [Handling undefined](#handling-undefined)
   - [Combining](#combining)
@@ -400,6 +401,59 @@ type Union = 'string' | 1 | true | null | undefined
 
 // type Intersection = A & B
 type Intersection = { name: string } & { age: number }
+
+// Keep in mind that a simple type like that is still a union
+type Union1 = 'x'
+// Because it's equal to:
+const union1 = new Set(['x']) // Set<string>
+
+// And
+type Union3 = never
+// is equal to:
+const union2 = new Set([]) // Set<never>
+```
+
+## Conditional checking
+
+```ts
+type Response = { status: 'loading' } | { status: 'success'; data: unknown } | { status: 'error'; error: Error }
+
+let response1: Response = {
+  status: 'success',
+  error: new Error('Just an error') // ❌ Error: Object literal may only specify known properties, and 'error' does not exist in type '{ status: "success"; data: unknown; }'
+}
+
+let response2: Response = {
+  status: 'error',
+  error: new Error('Just an error') // ✅ status is 'error' with error property is OK
+}
+
+let response3: Response = {
+  status: 'success',
+  data: { name: 'John' } // ✅ status is 'success' with data property is OK
+}
+
+// Type is narrowed with condition
+const handler = (state: Response): string => {
+  if (state.status === 'loading') {
+    state // { status: "loading" }
+    return '⏳'
+  }
+
+  if (state.status === 'success') {
+    // state is *narrowed*:
+    state // { status: "success", data: number }
+    return '✅'
+  }
+
+  if (state.status === 'error') {
+    state // { status: "error"; error: Error }
+    return '❌'
+  }
+
+  // If status is not 'loading', 'success' or 'error', so it will be:
+  return state // never
+}
 ```
 
 ## Accessibility Rules
@@ -439,29 +493,53 @@ console.log(admin.extraProperty)
 // }
 ```
 
-## Accessing Properties
+## Distribution and Accessing Properties
 
 ```ts
-// type NameOrAge = User["name" | "age"]
+type NameOrAge = User['name' | 'age']
+// Is equal to:
 type NameOrAge = User['name'] | User['age']
 
 type Age = User['age']
 type Role = User['isAdmin']
+
+// These two are not equivalent:
+type Response1 = { status: 'success' | 'error' }
+// Equal to:
+type Response2 = { status: 'success' } | { status: 'error' }
+
+// But these are equivalent:
+type IsString<T> = T extends string ? 'yes' : 'no'
+
+type CheckString1 = IsString<'a' | 2 | 'b'>
+// Is equal to:
+type CheckString2 =
+  | ('a' extends string ? 'yes' : 'no')
+  | (2 extends string ? 'yes' : 'no')
+  | ('c' extends string ? 'yes' : 'no')
+// Is equal to:
+type CheckString3 = 'yes' | 'no' | 'yes'
+// Is equal to:
+type CheckString4 = 'yes' | 'no'
+
+// All values are duplicated in one array
+type Duplicate<T> = [T, T]
+type Duplicated = Duplicate<1 | 2 | 3> // [2 | 1 | 3, 2 | 1 | 3]
+
+// Each value is duplicated in one separated array
+type DistributedDuplicate<U> = U extends unknown ? [U, U] : never
+type DistributedDuplicated = DistributedDuplicate<1 | 2 | 3> // [2, 2] | [1, 1] | [3, 3]
 ```
 
 ## Key Extraction
 
 ```ts
-type Keys = keyof User
-// type Keys = "name" | "age" | "isAdmin"
+type Keys = keyof User // type Keys = "name" | "age" | "isAdmin"
 
-type Values = User[keyof User]
-// type Values = string | number | boolean
-
+type Values = User[keyof User] // type Values = string | number | boolean
 // Is Equal to:
 type ValueOf<T> = T[keyof T]
-type UserValues = ValueOf<User>
-// type UserValues = string | number | boolean
+type UserValues = ValueOf<User> // type UserValues = string | number | boolean
 ```
 
 ## Handling undefined
@@ -472,26 +550,23 @@ type User = {
   age?: number
 }
 
-// ✅ No need to add age property
 const user: User = {
   name: 'John'
-}
+} // ✅ No need to add age property
 
 type User = {
   name: string
   age: number | undefined
 }
 
-// ❌ Age property can be undefined but should be here
 const user: User = {
   name: 'John'
-}
+} // ❌ Age property can be undefined but should be here
 
-// ✅
 const user: User = {
   name: 'John',
   age: undefined
-}
+} // ✅
 ```
 
 ## Combining
