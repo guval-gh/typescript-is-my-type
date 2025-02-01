@@ -25,6 +25,7 @@
   - [Key Extraction](#key-extraction)
   - [Handling undefined](#handling-undefined)
   - [Combining](#combining)
+- [Mapped Types](#mapped-types)
 - [Helper/Utility Types](#helperutility-types)
   - [Record](#record)
   - [Readonly](#readonly)
@@ -567,6 +568,110 @@ const user: User = {
   name: 'John',
   age: undefined
 } // ✅
+```
+
+# Mapped Types
+
+Mapped types in TypeScript allow you to create new types based on existing ones by transforming each property according to a rule, similar to how array's map() transforms each element.
+
+```ts
+// Basic example
+type User = {
+  name: string
+  age: number
+  email: string
+}
+
+// Makes all properties optional
+type PartialUser = {
+  [Property in keyof User]?: User[Property]
+}
+
+// Makes all properties readonly
+type ReadonlyUser = {
+  readonly [Property in keyof User]: User[Property]
+}
+
+// Changes all properties to boolean
+type UserFlags = {
+  [Property in keyof User]: boolean
+}
+
+const userFlags: UserFlags = {
+  name: true,
+  age: false,
+  email: true
+}
+```
+
+```ts
+// Complex examples
+type User = {
+  name: string
+  age: number
+  email: string
+  address: {
+    street: string
+    city: string
+  }
+}
+
+// Add 'is' prefix and make all properties boolean
+type UserValidation = {
+  [Property in keyof User as `is${Capitalize<string & Property>}Valid`]: boolean
+}
+// Results in:
+// {
+//   isNameValid: boolean
+//   isAgeValid: boolean
+//   isEmailValid: boolean
+//   isAddressValid: boolean
+// }
+
+// Make all properties nullable and add metadata
+type UserWithMetadata = {
+  [Property in keyof User]: {
+    value: User[Property] | null
+    lastModified: Date
+    modifiedBy: string
+  }
+}
+// Results in:
+// {
+//   name: { value: string | null, lastModified: Date, modifiedBy: string }
+//   age: { value: number | null, lastModified: Date, modifiedBy: string }
+//   email: { value: string | null, lastModified: Date, modifiedBy: string }
+//   address: { value: { street: string, city: string } | null, lastModified: Date, modifiedBy: string }
+// }
+
+// Exclude specific keys and make remaining properties arrays
+type UserLists = {
+  [Property in Exclude<keyof User, 'address'>]: Array<User[Property]>
+}
+// Results in:
+// {
+//   name: string[]
+//   age: number[]
+//   email: string[]
+// }
+
+// Recursive mapped type that makes all properties deep readonly
+type DeepReadonly<T> = {
+  readonly [Property in keyof T]: T[Property] extends object ? DeepReadonly<T[Property]> : T[Property]
+}
+
+const readonlyUser: DeepReadonly<User> = {
+  name: 'John',
+  age: 30,
+  email: 'john@example.com',
+  address: {
+    street: 'Main St',
+    city: 'Boston'
+  }
+}
+// Cannot modify any property at any level
+// readonlyUser.name = 'Jane' // Error
+// readonlyUser.address.city = 'New York' // Error
 ```
 
 ## Combining
