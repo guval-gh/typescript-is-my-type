@@ -1366,10 +1366,10 @@ const processProduct = (id: ProductId) => console.log(`Processing product: ${id}
 const processOrder = (id: OrderId) => console.log(`Processing order: ${id}`)
 
 // Example usage
-const ProductId = createProductId('product123')
+const productId = createProductId('product123')
 const orderId = createOrderId('order123')
 
-processProduct(ProductId) // ✅ OK
+processProduct(productId) // ✅ OK
 processOrder(orderId) // ✅ OK
 
 // These will cause type errors
