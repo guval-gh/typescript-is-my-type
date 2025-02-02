@@ -55,6 +55,9 @@
   - [Filter loop](#filter-loop)
   - [Reduce loop](#reduce-loop)
 - [Template Literals](#template-literals)
+- [Branded and Flavored Types](#branded-and-flavored-types)
+  - [Branded](#branded)
+  - [Flavored](#flavored)
 - [TypeScript Tips and Tricks](#typescript-tips-and-tricks)
   - [Create Type from Enum](#create-type-from-enum)
   - [Create Type from Function return](#create-type-from-function-return)
@@ -1196,6 +1199,77 @@ type FromEntries<Entries, Acc = {}> = Entries extends [infer Entry, ...infer Res
 
 type Product = FromEntries<[['title', 'iPhone'], ['price', 999], ['inStock', true]]>
 // type Product = { title: string; price: number; inStock: boolean }
+```
+
+# Branded and Flavored Types
+
+## Branded
+
+Branded types help create type-safe identifiers that prevent accidental mixing of similar-looking values:
+
+```ts
+// Generic Branded Type
+type Branded<T, Brand extends string> = T & { readonly __brand: Brand }
+
+type Email = Branded<string, 'Email'>
+type Username = Branded<string, 'Username'>
+
+const createEmail = (email: string): Email => {
+  if (!email.includes('@')) {
+    throw new Error('Invalid email format')
+  }
+  return email as Email
+}
+
+const createUsername = (username: string): Username => {
+  if (username.length < 3) {
+    throw new Error('Username must be at least 3 characters long')
+  }
+  return username as Username
+}
+
+const sendEmail = (email: Email) => {
+  console.log(`Sending email to: ${email}`)
+}
+
+const registerUser = (username: Username) => {
+  console.log(`Registering user: ${username}`)
+}
+
+const validEmail = createEmail('user@example.com')
+const validUsername = createUsername('johndoe')
+
+sendEmail(validEmail) // ✅ OK
+registerUser(validUsername) // ✅ OK
+
+// Type-safe: These would cause compile-time errors
+// sendEmail('invalid-email') // ❌ Type error
+// registerUser(validEmail) // ❌ Type error
+```
+
+## Flavored
+
+Flavored types are similar to branded types but provide a way to add type-safe distinctions between similar types without adding runtime overhead:
+
+```ts
+// Flavored Type
+type Flavored<T, Flavor> = T & { readonly __flavor?: Flavor }
+
+type USD = Flavored<number, 'USD'>
+type EUR = Flavored<number, 'EUR'>
+
+const convertUSD = (amount: USD): number => amount
+const convertEUR = (amount: EUR): number => amount
+
+const usdAmount: USD = 100 as USD
+const eurAmount: EUR = 100 as EUR
+
+convertUSD(usdAmount) // ✅ OK
+convertEUR(eurAmount) // ✅ OK
+
+// Type-safe: These would cause compile-time errors
+// convertUSD(eurAmount) // ❌ Type error
+// convertEUR(usdAmount) // ❌ Type error
 ```
 
 # Template Literals
